@@ -1,0 +1,96 @@
+1- Install k8s cluster (minikube)
+----------------------------------------------------------------------------------------
+2- Create a pod with the name redis and with the image redis.
+
+> kubectl run redis --image=redis
+----------------------------------------------------------------------------------------
+3- Create a pod with the name nginx and with the image "nginx123"
+Use a pod-definition YAML file.
+
+> kubectl create -f pod.yml
+----------------------------------------------------------------------------------------
+4- What is the nginx pod status?
+
+[GeniusBoy@mohamed Lab1]$ kubectl get pod nginx 
+NAME    READY   STATUS             RESTARTS   AGE
+nginx   0/1     ImagePullBackOff   0          88s
+----------------------------------------------------------------------------------------
+5- Change the nginx pod image to "nginx" check the status again
+
+[GeniusBoy@mohamed Lab1]$ kubectl get pod nginx 
+NAME    READY   STATUS    RESTARTS   AGE
+nginx   1/1     Running   0          4m3s
+----------------------------------------------------------------------------------------
+6- How many ReplicaSets exist on the system?
+
+> kubectl get rs
+[GeniusBoy@mohamed Lab1]$ kubectl get rs
+No resources found in default namespace.
+----------------------------------------------------------------------------------------
+7- create a ReplicaSet with
+name= replica-set-1
+image= busybox
+replicas= 3
+
+[GeniusBoy@mohamed Lab1]$ kubectl apply -f ReplicaSet.yml 
+replicaset.apps/replica-set-1 created
+[GeniusBoy@mohamed Lab1]$ kubectl get rs
+NAME            DESIRED   CURRENT   READY   AGE
+replica-set-1   3         3         0       10s
+[GeniusBoy@mohamed Lab1]$ kubectl get pods
+NAME                  READY   STATUS    RESTARTS   AGE
+nginx                 1/1     Running   0          40m
+redis                 1/1     Running   0          39m
+replica-set-1-8bpkb   1/1     Running   0          38s
+replica-set-1-pdgqz   1/1     Running   0          38s
+replica-set-1-r2kks   1/1     Running   0          38s
+----------------------------------------------------------------------------------------
+8- Scale the ReplicaSet replica-set-1 to 5 PODs.
+
+> kubectl scale --replicas=5 -f ReplicaSet.yml
+
+[GeniusBoy@mohamed Lab1]$ kubectl get rs
+NAME            DESIRED   CURRENT   READY   AGE
+replica-set-1   5         5         5       19m
+[GeniusBoy@mohamed Lab1]$ kubectl get pods
+NAME                  READY   STATUS    RESTARTS        AGE
+nginx                 1/1     Running   3 (2m33s ago)   58m
+redis                 1/1     Running   2 (2m56s ago)   58m
+replica-set-1-8bpkb   1/1     Running   2 (2m46s ago)   19m
+replica-set-1-95vzp   1/1     Running   0               55s
+replica-set-1-h6rnh   1/1     Running   0               55s
+replica-set-1-pdgqz   1/1     Running   2 (2m46s ago)   19m
+replica-set-1-r2kks   1/1     Running   2 (2m46s ago)   19m
+----------------------------------------------------------------------------------------
+9- How many PODs are READY in the replica-set-1?
+
+[GeniusBoy@mohamed Lab1]$ kubectl get pods
+NAME                  READY   STATUS    RESTARTS        AGE
+nginx                 1/1     Running   3 (2m33s ago)   58m
+redis                 1/1     Running   2 (2m56s ago)   58m
+replica-set-1-8bpkb   1/1     Running   2 (2m46s ago)   19m
+replica-set-1-95vzp   1/1     Running   0               55s
+replica-set-1-h6rnh   1/1     Running   0               55s
+replica-set-1-pdgqz   1/1     Running   2 (2m46s ago)   19m
+replica-set-1-r2kks   1/1     Running   2 (2m46s ago)   19m
+----------------------------------------------------------------------------------------
+10- Delete any one of the 5 PODs then check How many PODs exist now?
+
+> kubectl delete pod replica-set-1-8bpkb
+pod "replica-set-1-8bpkb" deleted
+[GeniusBoy@mohamed Lab1]$ kubectl get pods
+NAME                  READY   STATUS    RESTARTS        AGE
+nginx                 1/1     Running   3 (5m25s ago)   61m
+redis                 1/1     Running   2 (5m48s ago)   60m
+replica-set-1-95vzp   1/1     Running   0               3m47s
+replica-set-1-h6rnh   1/1     Running   0               3m47s
+replica-set-1-pdgqz   1/1     Running   2 (5m38s ago)   22m
+replica-set-1-r2kks   1/1     Running   2 (5m38s ago)   22m
+replica-set-1-vc68v   1/1     Running   0               45s
+
+still 5 pods !
+----------------------------------------------------------------------------------------
+Why are there still 5 PODs, even after you deleted one?
+
+because that's the usage of replica-set the high availability achievment.
+----------------------------------------------------------------------------------------
