@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-1
+spec:
+  template:
+    metadata:
+      labels:
+        app: busybox-pod
+    spec:
+      containers:
+        - name: busybox-container
+          image: busybox
+          command: ["/bin/sh", "-ec", "sleep 1000"] # because this image has nothing to still runing (service)
+  replicas: 3
+  selector:
+    matchLabels:
+      app: busybox-pod

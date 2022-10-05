@@ -1,0 +1,80 @@
+11- How many Deployments and ReplicaSets exist on the system? (0,0)
+
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl get deployments
+No resources found in default namespace.
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl get rs
+No resources found in default namespace.
+---------------------------------------------------------------------
+12- create a Deployment with
+name= deployment-1
+image= busybox
+replicas= 3
+
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl apply -f deployment-1.yml 
+deployment.apps/deployment-1 created
+
+13- How many Deployments and ReplicaSets exist on the system now? (1,1)
+
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl get deployments
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment-1   3/3     3            3           29s
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl get rs
+NAME                      DESIRED   CURRENT   READY   AGE
+deployment-1-66f6869847   3         3         3       34s
+---------------------------------------------------------------------
+14- How many pods are ready with the deployment-1? (3)
+
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+deployment-1-66f6869847-4cf4s   1/1     Running   0          113s
+deployment-1-66f6869847-gphdh   1/1     Running   0          113s
+deployment-1-66f6869847-kdw2m   1/1     Running   0          113s
+---------------------------------------------------------------------
+15- Update deployment-1 image to nginx then check the ready pods again
+
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl set image deployment deployment-1 busybox-container=nginx
+deployment.apps/deployment-1 image updated
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl get pods
+NAME                            READY   STATUS        RESTARTS   AGE
+deployment-1-5fd9cfb485-4f6hc   1/1     Running       0          15s
+deployment-1-5fd9cfb485-8w5t9   1/1     Running       0          24s
+deployment-1-5fd9cfb485-tplqw   1/1     Running       0          20s
+deployment-1-66f6869847-bswp4   1/1     Terminating   0          5m17s
+deployment-1-66f6869847-gt54q   1/1     Terminating   0          5m17s
+deployment-1-66f6869847-wz59q   1/1     Terminating   0          5m17s
+---------------------------------------------------------------------
+16- Run kubectl describe deployment deployment-1 and check events
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl describe deployment deployment-1 
+
+What is the deployment strategy used to upgrade the deployment-1?
+StrategyType:           RollingUpdate
+---------------------------------------------------------------------
+17- Rollback the deployment-1
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl set image deployment deployment-1 busybox-container=busybox
+deployment.apps/deployment-1 image updated
+
+What is the used image with the deployment-1?
+(busybox)
+---------------------------------------------------------------------
+18- Create a deployment using nginx image with latest tag only and remember to
+mention tag i.e nginx:latest and name it as nginx-deployment. App labels should be
+app: nginx-app and type: front-end. The container should be named as
+nginx-container; also make sure replica counts are 3.
+
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl apply -f nginx-deployment.yml 
+deployment.apps/nginx-deployment created
+
+geniusboy@Mohamed-Alaa:~/Desktop/Kubernates/Lab2$ kubectl get all
+NAME                                    READY   STATUS    RESTARTS   AGE
+pod/nginx-deployment-64d6f5644d-fwrq4   1/1     Running   0          39s
+pod/nginx-deployment-64d6f5644d-wvd25   1/1     Running   0          39s
+pod/nginx-deployment-64d6f5644d-xfxlm   1/1     Running   0          39s
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   2d10h
+
+NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/nginx-deployment   3/3     3            3           39s
+
+NAME                                          DESIRED   CURRENT   READY   AGE
+replicaset.apps/nginx-deployment-64d6f5644d   3         3         3       39s
